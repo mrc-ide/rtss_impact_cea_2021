@@ -49,7 +49,6 @@ calibration_runs$total_m <- future_pmap_dbl(calibration_runs, calibration_run, .
 model_runs <- expand.grid(pfpr = pfpr_levels(),
                           season = c("perennial", "seasonal"),
                           draw = uncertainty_draws(),
-                          rtss = 1,
                           rtss_coverage = rtss_coverage()) %>%
   dplyr::left_join(calibration_runs, by = c("pfpr", "season"))
 
