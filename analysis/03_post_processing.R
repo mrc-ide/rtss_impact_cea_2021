@@ -5,30 +5,7 @@ library(patchwork)
 source("R/set_up.R")
 source("R/post_processing.R")
 
-imperial_2015 <- data.frame(
-  pfpr = pfpr_levels(),
-  ca = c(21354,
-  34380,
-  56371,
-  76293,
-  92080,
-  105797,
-  131926,
-  147711,
-  157981,
-  159282),
-  da = c(182,
-         250,
-         343,
-         411,
-         446,
-         465,
-         513,
-         516,
-         502,
-         475))
-
-model_output <- readRDS("analysis/data/model_output.rds")
+model_output <- readRDS("analysis/data/derived_data/model_output.rds")
 
 
 counterfactual <- dplyr::filter(model_output, rtss_coverage == 0) %>%

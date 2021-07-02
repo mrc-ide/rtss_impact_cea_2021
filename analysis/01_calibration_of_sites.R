@@ -52,4 +52,4 @@ model_runs <- expand.grid(pfpr = pfpr_levels(),
                           rtss_coverage = rtss_coverage()) %>%
   dplyr::left_join(calibration_runs, by = c("pfpr", "season"))
 
-saveRDS(model_runs, "analysis/data/model_runs.rds")
+saveRDS(model_runs, "analysis/data/derived_data/model_runs.rds")

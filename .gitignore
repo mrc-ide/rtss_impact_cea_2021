@@ -2,4 +2,4 @@
 .Rhistory
 .RData
 .Ruserdata
-analysis/data/model_output.rds
+analysis/data/derived_data/

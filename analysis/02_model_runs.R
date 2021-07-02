@@ -4,7 +4,7 @@ library(ggplot2)
 source("R/set_up.R")
 source("R/post_processing.R")
 
-model_runs <- readRDS("analysis/data/model_runs.rds") %>%
+model_runs <- readRDS("analysis/data/derived_data/model_runs.rds") %>%
   select(-rtss)
 
 # In this summary, impact is measure in year 5- 19 (inclusive)
@@ -73,4 +73,4 @@ model_output_raw <- future_pmap(test, model_run, .options = furrr_options(seed =
 
 model_output <- dplyr::bind_rows(model_output_raw)
 
-saveRDS(model_output, "analysis/data/model_output.rds")
+saveRDS(model_output, "analysis/data/derived_data/model_output.rds")
