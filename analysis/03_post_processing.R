@@ -18,10 +18,10 @@ counterfactual <- dplyr::filter(model_output_raw, rtss_coverage == 0) %>%
 pop <- 100000
 model_output <- filter(model_output_raw, rtss_coverage > 0) %>%
   left_join(counterfactual, by = c("pfpr", "season", "draw", "year", "age_lower", "age_upper")) %>%
-  mutate(cases = inc * prop * pop,
-         deaths = mort * prop * pop,
-         cases_cf = inc_cf * prop * pop,
-         deaths_cf = mort_cf * prop * pop,
+  mutate(cases = round(inc * prop * pop),
+         deaths = round(mort * prop * pop),
+         cases_cf = round(inc_cf * prop * pop),
+         deaths_cf = round(mort_cf * prop * pop),
          cases_averted = cases_cf - cases,
          deaths_averted = deaths_cf - deaths)
 
@@ -34,9 +34,10 @@ impact <- model_output %>%
             cases_averted = sum(cases_averted),
             deaths_averted = sum(deaths_averted)) %>%
   ungroup() %>%
-  mutate(cases_averted_per_100000_fvp = (cases_averted / fvp) * 100000,
-         deaths_averted_per_100000_fvp = (deaths_averted / fvp) * 100000)
+  mutate(cases_averted_per_100000_fvp = round((cases_averted / fvp) * 100000),
+         deaths_averted_per_100000_fvp = round((deaths_averted / fvp) * 100000))
 
+write.csv(impact, "analysis/output/imperial_impact_estimate_2021.csv", row.names = FALSE)
 
 ### Comparing current results with Penny et al #################################
 imperial_2015 <- readRDS("analysis/data/raw_data/imperial_2015.rds")

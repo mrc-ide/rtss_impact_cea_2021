@@ -21,7 +21,7 @@ model_run <- function(pfpr, season, draw, rtss_coverage, total_m){
   )
   
   if(rtss_coverage > 0){
-    rtss_options <- paste("pev_epi_coverage", rtss_coverage, "pev_boost_coverage", rtss_coverage * 0.8, "pev_epi_start 5 epi_age_1 6 epi_age_2 7.5 epi_age_3 9 epi_age_4 27")
+    rtss_options <- paste("pev_epi_coverage", rtss_coverage, "pev_boost_coverage", 0.8, "pev_epi_start 5 epi_age_1 6 epi_age_2 7.5 epi_age_3 9 epi_age_4 27")
     options <- paste("num_people 100000 num_runs 1 final_run 21 itn 0 irs 0 smc 0 epi_pev 1 total_M", total_m,  "add", mlgts::bionomics_string(vectors()), rtss_options)
   } else {
     options <- paste("num_people 100000 num_runs 1 final_run 21 itn 0 irs 0 smc 0 epi_pev 0 total_M", total_m,  "add", mlgts::bionomics_string(vectors()))
@@ -52,7 +52,6 @@ model_run <- function(pfpr, season, draw, rtss_coverage, total_m){
     model_output_to_long(pfpr, season, draw, rtss_coverage, fvp) %>%
     # Replace -999
     replace_missing()
-  
   
   return(out)
 }
