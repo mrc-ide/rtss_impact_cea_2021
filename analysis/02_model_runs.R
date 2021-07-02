@@ -51,8 +51,7 @@ model_run <- function(pfpr, season, draw, rtss_coverage, total_m){
     # Formatting
     model_output_to_long(pfpr, season, draw, rtss_coverage, fvp) %>%
     # Replace -999
-    replace_missing() %>%
-    mortality_rate()
+    replace_missing()
   
   
   return(out)
