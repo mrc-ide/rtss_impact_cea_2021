@@ -116,4 +116,13 @@ calibration_output_vars <- function(){
     dplyr::mutate(name = paste("prev", lower, upper, sep = "_"))
 }
 
+#' Total_M guess
+#'
+#' @param pfpr Prevalence 2-10
+#'
+#' @return A ballpark guess at total_M
+#' @export
+total_m_guess <- function(pfpr){
+  exp(-1.3439 + 8.0916 * pfpr)
+}
 

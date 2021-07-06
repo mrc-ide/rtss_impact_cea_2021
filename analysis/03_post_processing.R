@@ -7,7 +7,7 @@ source("R/post_processing.R")
 
 # Load model outputs
 model_output_raw <- readRDS("analysis/data/derived_data/model_output.rds") %>%
-  mortality_rate()
+  mortality_rate(treatment_coverage = 0)
 # Isolate the counterfactual runs (no rtss)
 counterfactual <- dplyr::filter(model_output_raw, rtss_coverage == 0) %>%
   select(-prev, -prop, -rtss_coverage, -fvp) %>%
@@ -25,7 +25,26 @@ model_output <- filter(model_output_raw, rtss_coverage > 0) %>%
          cases_averted = cases_cf - cases,
          deaths_averted = deaths_cf - deaths)
 
-# Estimate impact per 100,000 FVP
+### Checking prevalence baseline ###############################################
+prev <- model_output %>%
+  filter(age_lower >1,
+         age_upper <= 10) %>%
+  group_by(year, pfpr, season, draw, rtss_coverage) %>%
+  summarise(prev = weighted.mean(prev, prop))
+
+baseline_check <- ggplot(prev, aes(x = year, y = prev, col = factor(pfpr))) + 
+  geom_hline(aes(yintercept = pfpr, col = factor(pfpr)), lty = 2) +
+  geom_line(size = 1) +
+  scale_color_discrete(name = "PfPr2-10") +
+  ylab("PfPr2-10") +
+  xlab("Year") +
+  theme_bw() +
+  facet_wrap(~season)
+baseline_check
+ggsave("analysis/plots/baseline_check.pdf", baseline_check, height = 5, width = 10)
+################################################################################
+
+### Estimate impact per 100,000 FVP ############################################
 impact <- model_output %>%
   filter(year >=5,
          year <= 19) %>%
@@ -38,6 +57,7 @@ impact <- model_output %>%
          deaths_averted_per_100000_fvp = round((deaths_averted / fvp) * 100000))
 
 write.csv(impact, "analysis/output/imperial_impact_estimate_2021.csv", row.names = FALSE)
+################################################################################
 
 ### Comparing current results with Penny et al #################################
 imperial_2015 <- readRDS("analysis/data/raw_data/imperial_2015.rds")
@@ -59,7 +79,9 @@ compare_deaths_plot <- ggplot(comparison_data, aes(x = deaths_averted_imperial, 
   ylab("Current: Deaths averted") +
   coord_fixed() +
   theme_bw()
-compare_cases_plot | compare_deaths_plot
+comparison_plot <- compare_cases_plot | compare_deaths_plot
+comparison_plot
+ggsave("analysis/plots/comparison_plot.pdf", comparison_plot, height = 5, width = 10)
 ################################################################################
 
 ### Impact by transmission level, replicating figure 2 #########################
