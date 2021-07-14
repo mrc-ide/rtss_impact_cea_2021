@@ -73,7 +73,7 @@ rtss_coverage <- function(){
 #' @param non_act_coverage non ACT coverage
 #'
 #' @export
-treatment_option <- function(act_coverage = 0.26, non_act_coverage = 0.26){
+treatment_option <- function(act_coverage = 0.2647059, non_act_coverage = 0.2647059){
   # 0: Sulphadoxine-Pyrimethamine (SP). The front-line treatment from early to ~ mid 2000.
   # 1: Artemether/lumefantrine (AL). Tradename: coartem.
   # 2: Dihydroartemisinin/piperaquine (DHA-P/DHA-Pip/DHA-PQP)
@@ -126,3 +126,29 @@ total_m_guess <- function(pfpr){
   exp(-1.3439 + 8.0916 * pfpr)
 }
 
+#' Vaccine options
+#'
+#' Replicate vaccine options from 2015 analysis
+#' @export
+vaccine_options <- function(){
+  "epi_age_1 8.98 epi_age_2 8.99 epi_age_3 9 epi_age_4 27 pev1_alpha 0.77  pev1_beta 87.3  pev1_Vmax 0.90  pev1_ab_mu 6.6170  pev1_ab_boost_mu 5.9112  pev1_ab_sigma 0.832  pev1_ab_boost_sigma 0.9262  pev1_d1_mu 3.771538  pev1_d1_sigma 0.3379437  pev1_d2_mu 6.297028  pev1_d2_sigma  0.3772515  pev1_rho_mu 2.37704  pev1_rho_boost_mu 1.03098  pev1_rho_sigma 1.01076  pev1_rho_boost_sigma 1.03912"
+}
+
+#' Create a site file
+#'
+#' @param pfpr Prevalence 2-10
+#' @param season Seanal profile
+#' @export
+create_site <- function(pfpr, season){
+  site <- rbind(
+    mlgts::site_create(
+      vectors = vectors(),
+      seasonality = seasonality(season),
+      total_M = 1
+    ),
+    treatment_option()
+  )
+  site[site$par == "prev", 2] <- pfpr
+  site[site$par == "prev_years", 2] <- 2
+  return(site)
+}
