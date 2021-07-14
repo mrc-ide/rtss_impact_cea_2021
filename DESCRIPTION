@@ -1,6 +1,6 @@
 Package: rtss_impact_cea_2021
 Title: Update of analysis from Penny et al 2015 
-Version: 0.0.0.1
+Version: 0.0.2
 Authors@R: 
     person(given = "Peter",
            family = "Winskill",
