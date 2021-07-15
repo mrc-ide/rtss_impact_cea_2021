@@ -1,5 +1,3 @@
-# old <- read.table("C:/Users/pwinskil/Dropbox (SPH Imperial College)/shared_RTSScomparison2021/2015_predictions/Data_finalPapers/Imperial/RTSSABmodel_Restructured3.txt", header = TRUE)
-
 # Convert old output to epi_age_year style
 conversion_epi_age_year <- function(old){
   old %>%
