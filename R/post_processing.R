@@ -70,8 +70,7 @@ mortality_rate <- function(x, scaler = 0.215, treatment_scaler = 0.5, treatment_
     dplyr::mutate(mort = (1 - (treatment_scaler * treatment_coverage)) * scaler * .data$sev)
 }
 
-
-create_age <- function(out, pop = 100000){
+process_epi <- function(out, pop = 100000){
   out %>%
     # Dropping non_smooth output and intervention number output
     dplyr::select(pfpr, season, draw, rtss_coverage, year, dplyr::contains("smooth")) %>%
@@ -85,29 +84,31 @@ create_age <- function(out, pop = 100000){
            deaths = round(mort * prop * pop))
 }
 
-create_pop <- function(out){ 
-  out %>%
+process_vx_tx <- function(x){
+  x %>%
     dplyr::mutate(
       num_vaccinees = c(0, diff(num_vaccinees)),
       num_vacc_doses = c(0, diff(num_vacc_doses)),
       num_vaccinees_boost = c(0, diff(num_vaccinees_boost)),
       num_act = c(0, diff(num_act)),
-      num_trt = c(0, diff(num_trt)) - num_act) %>%
-    select(pfpr, season, draw, rtss_coverage, year, num_vaccinees, num_vacc_doses, num_vaccinees_boost, num_act, num_trt)
+      num_non_act = c(0, diff(num_trt)) - num_act) %>%
+    select(pfpr, season, draw, rtss_coverage, year, num_vaccinees, num_vacc_doses, num_vaccinees_boost, num_act, num_non_act)
+
+  
 }
 
-compare_age <- function(x){
-  x <- x %>%
-    select(-prev, -inc, -sev, -mort, -prop)
-  
-  x_cf <- x %>%
+estimate_impact <- function(x){
+  # Counterfactual runs
+  x_cf <- x  %>%
+    select(-prev, -inc, -sev, -mort, -prop) %>%
     filter(rtss_coverage == 0) %>%
     select(-rtss_coverage) %>%
     rename(cases_cf = cases,
            deaths_cf = deaths)
+  # Vx runs
   x_int <- x %>%
     filter(rtss_coverage > 0)
-  
+  # Comparison
   compare <- left_join(x_int, x_cf, by = c("pfpr", "season", "draw", "year", "age_lower", "age_upper")) %>%
     mutate(cases_averted = cases_cf - cases,
            deaths_averted = deaths_cf - deaths)
@@ -115,28 +116,32 @@ compare_age <- function(x){
   return(compare)
 }
 
-age_impact_vaccines <- function(age_impact, pop){
-  age_collapse <- age_impact %>%
-    filter(year > 0) %>%
-    group_by(pfpr, season, draw, rtss_coverage) %>%
-    summarise(cases = sum(cases),
-              deaths = sum(deaths),
-              deaths_averted = sum(deaths_averted),
-              cases_averted = sum(cases_averted))
-  pop_collapse <- pop %>%
-    filter(year > 0) %>%
-    group_by(pfpr, season, draw, rtss_coverage) %>%
-    ### TODO: Correction for small pop!
-    summarise(
-      num_vaccinees  = sum(num_vaccinees) ,
-      num_vacc_doses = sum(num_vacc_doses), 
-      num_vaccinees_boost = sum(num_vaccinees_boost)
-    )
-  
-  aiv <- age_collapse %>%
-    left_join(pop_collapse) %>%
-    mutate(
-      cases_averted_per_100000_fvp = 100000 * (cases_averted / num_vaccinees),
-      deaths_averted_per_100000_fvp = 100000 * (deaths_averted / num_vaccinees))
-  return(aiv)
+tx_cf <- function(x){
+  x_cf <- x %>%
+    filter(rtss_coverage == 0) %>%
+    select(-rtss_coverage, -num_vaccinees, -num_vacc_doses, -num_vaccinees_boost) %>%
+    rename(num_act_cf = num_act,
+           num_non_act_cf = num_non_act)
+
+  x %>%
+    filter(rtss_coverage > 0) %>%
+    left_join(x_cf, by = c("pfpr", "season", "draw", "year"))
 }
+
+aggregate_epi <- function(x, ...){
+  x %>%
+    group_by(...) %>%
+    summarise(across(cases:deaths_averted, sum)) %>%
+    ungroup()
+}
+
+aggregate_vx_tx <- function(x, ...){
+  x %>%
+    group_by(...) %>%
+    summarise(across(num_vaccinees:num_non_act_cf, sum)) %>%
+    ungroup()
+}
+
+
+
+
