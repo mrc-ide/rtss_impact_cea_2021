@@ -70,11 +70,20 @@ mortality_rate <- function(x, scaler = 0.215, treatment_scaler = 0.5, treatment_
     dplyr::mutate(mort = (1 - (treatment_scaler * treatment_coverage)) * scaler * .data$sev)
 }
 
+
+#' Join life expectancy
+#'
+#' @param x data
+#' @param le Life expectancy table
 life_expectancy <- function(x, le){
   x %>%
     left_join(le, by = c("age_lower", "age_upper"))
 }
 
+
+#' Estimate DALYs
+#'
+#' @param x data
 dalys <- function(x){
   x %>%
     mutate(dalys = deaths * life_expectancy + cases * 0.01375342 * 0.211 + severe * 0.04794521 * 0.6,
