@@ -70,7 +70,22 @@ mortality_rate <- function(x, scaler = 0.215, treatment_scaler = 0.5, treatment_
     dplyr::mutate(mort = (1 - (treatment_scaler * treatment_coverage)) * scaler * .data$sev)
 }
 
+life_expectancy <- function(x, le){
+  x %>%
+    left_join(le, by = c("age_lower", "age_upper"))
+}
+
+dalys <- function(x){
+  x %>%
+    mutate(dalys = deaths * life_expectancy + cases * 0.01375342 * 0.211 + severe * 0.04794521 * 0.6,
+           # Discounted dalys
+           ddalys = deaths * life_expectancy_discounted + cases * 0.01375342 * 0.211 + severe * 0.04794521 * 0.6) %>%
+    select(-life_expectancy, -life_expectancy_discounted)
+}
+
+
 process_epi <- function(out, pop = 100000){
+  le <- read.csv("analysis/data/raw_data/life_expectancy.csv")
   out %>%
     # Dropping non_smooth output and intervention number output
     dplyr::select(pfpr, season, draw, rtss_coverage, year, dplyr::contains("smooth")) %>%
@@ -79,9 +94,12 @@ process_epi <- function(out, pop = 100000){
     # Replace -999
     replace_missing() %>%
     # Process epi outputs
-    mortality_rate(treatment_coverage = 0)%>%
+    mortality_rate(treatment_coverage = 0) %>%
     mutate(cases = round(inc * prop * pop),
-           deaths = round(mort * prop * pop))
+           severe = round(sev * prop * pop),
+           deaths = round(mort * prop * pop)) %>%
+    life_expectancy(le = le) %>%
+    dalys()
 }
 
 process_vx_tx <- function(x){
@@ -93,7 +111,7 @@ process_vx_tx <- function(x){
       num_act = c(0, diff(num_act)),
       num_non_act = c(0, diff(num_trt)) - num_act) %>%
     select(pfpr, season, draw, rtss_coverage, year, num_vaccinees, num_vacc_doses, num_vaccinees_boost, num_act, num_non_act)
-
+  
   
 }
 
@@ -104,14 +122,20 @@ estimate_impact <- function(x){
     filter(rtss_coverage == 0) %>%
     select(-rtss_coverage) %>%
     rename(cases_cf = cases,
-           deaths_cf = deaths)
+           severe_cf = severe,
+           deaths_cf = deaths,
+           dalys_cf = dalys,
+           ddalys_cf = ddalys)
   # Vx runs
   x_int <- x %>%
     filter(rtss_coverage > 0)
   # Comparison
   compare <- left_join(x_int, x_cf, by = c("pfpr", "season", "draw", "year", "age_lower", "age_upper")) %>%
     mutate(cases_averted = cases_cf - cases,
-           deaths_averted = deaths_cf - deaths)
+           severe_averted = severe_cf - severe,
+           deaths_averted = deaths_cf - deaths,
+           dalys_averted = dalys_cf - dalys,
+           ddalys_averted = ddalys_cf - ddalys)
   
   return(compare)
 }
@@ -122,7 +146,7 @@ tx_cf <- function(x){
     select(-rtss_coverage, -num_vaccinees, -num_vacc_doses, -num_vaccinees_boost) %>%
     rename(num_act_cf = num_act,
            num_non_act_cf = num_non_act)
-
+  
   x %>%
     filter(rtss_coverage > 0) %>%
     left_join(x_cf, by = c("pfpr", "season", "draw", "year"))
@@ -131,7 +155,7 @@ tx_cf <- function(x){
 aggregate_epi <- function(x, ...){
   x %>%
     group_by(...) %>%
-    summarise(across(cases:deaths_averted, sum)) %>%
+    summarise(across(cases:ddalys_averted, sum)) %>%
     ungroup()
 }
 
@@ -142,6 +166,26 @@ aggregate_vx_tx <- function(x, ...){
     ungroup()
 }
 
+add_costs <- function(x, cost_per_dose = c(2, 5, 10), delivery_cost = c(0.96, 1.62,	2.67), tx_unit_cost = 1.47, severe_unit_cost = 22.41){
+  cost_df <- expand_grid(cost_per_dose = cost_per_dose, delivery_cost = delivery_cost)
+  merge(x, cost_df, by = NULL) %>%
+    mutate(vaccine_cost = num_vacc_doses * (cost_per_dose + delivery_cost),
+           tx_cost = (num_act + num_non_act) * tx_unit_cost,
+           tx_cost_cf = (num_act_cf + num_non_act_cf) * tx_unit_cost,
+           severe_cost = severe * severe_unit_cost,
+           severe_cost_cf = severe_cf * severe_unit_cost,
+           cost = vaccine_cost + tx_cost + severe_cost,
+           cost_cf = tx_cost_cf + severe_cost_cf,
+           marginal_cost = cost - cost_cf)
+}
 
+extimate_icer <- function(x){
+  x %>%
+  mutate(
+    icer_case = marginal_cost / cases_averted,
+    icer_daly = marginal_cost / dalys_averted,
+    icer_ddaly = marginal_cost / ddalys_averted
+    )
+}
 
 

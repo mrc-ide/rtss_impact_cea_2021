@@ -35,6 +35,16 @@ vx_tx <- vx_tx_year %>%
   aggregate_vx_tx(pfpr, season, draw, rtss_coverage)
 
 
+# Combined epi and costing (aggregated)
+impact <- epi %>%
+  left_join(vx_tx, by = c("pfpr", "season", "draw")) %>%
+  mutate(
+    cases_averted_per_100000_fvp = 100000 * (cases_averted / num_vaccinees),
+    deaths_averted_per_100000_fvp = 100000 * (deaths_averted / num_vaccinees)
+  ) %>%
+  add_costs() %>%
+  extimate_icer()
+
 
 
 
