@@ -190,10 +190,18 @@ add_costs <- function(x, cost_per_dose = c(2, 5, 10), delivery_cost = c(0.96, 1.
 
 extimate_icer <- function(x){
   x %>%
-  mutate(
-    icer_case = marginal_cost / cases_averted,
-    icer_daly = marginal_cost / dalys_averted,
-    icer_ddaly = marginal_cost / ddalys_averted
+    mutate(
+      icer_case = marginal_cost / cases_averted,
+      icer_daly = marginal_cost / dalys_averted,
+      icer_ddaly = marginal_cost / ddalys_averted
+    )
+}
+
+add_impact_fvp <- function(x){
+  x %>%
+    mutate(
+      cases_averted_per_100000_fvp = 100000 * (cases_averted / num_vaccinees),
+      deaths_averted_per_100000_fvp = 100000 * (deaths_averted / num_vaccinees)
     )
 }
 

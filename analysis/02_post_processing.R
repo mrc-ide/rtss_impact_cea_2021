@@ -38,10 +38,7 @@ vx_tx <- vx_tx_year %>%
 # Combined epi and costing (aggregated)
 impact <- epi %>%
   left_join(vx_tx, by = c("pfpr", "season", "draw")) %>%
-  mutate(
-    cases_averted_per_100000_fvp = 100000 * (cases_averted / num_vaccinees),
-    deaths_averted_per_100000_fvp = 100000 * (deaths_averted / num_vaccinees)
-  ) %>%
+  add_impact_fvp() %>%
   add_costs() %>%
   extimate_icer()
 
@@ -71,12 +68,7 @@ baseline_check
 ################################################################################
 
 ### Comparison with prior results ##############################################
-impact_data <- epi %>%
-  left_join(vx_tx, by = c("pfpr", "season", "draw")) %>%
-  mutate(
-    cases_averted_per_100000_fvp = 100000 * (cases_averted / num_vaccinees),
-    deaths_averted_per_100000_fvp = 100000 * (deaths_averted / num_vaccinees)
-  ) %>%
+impact_data <- impact %>%
   left_join(readRDS("analysis/data/raw_data/imperial_2015.rds"), by = "pfpr")
 
 c1 <- ggplot(impact_data, aes(x = cases_averted_imperial, y = cases_averted_per_100000_fvp)) +
@@ -124,6 +116,35 @@ da <- ggplot(impact_data, aes(x = factor(pfpr * 100), y = deaths_averted_per_100
 impact_plot <- ca / da
 ggsave("analysis/plots/impact_plot.png", impact_plot, height = 10, width = 5)
 ################################################################################
+
+### Cost per case and daly averted, replicating Figure 4 #######################
+cpc_data <- impact %>%
+  filter(delivery_cost == 1.62)
+
+cp_plot <- function(x, title, ylab, ymax, ...){
+  ggplot(x, aes(x = pfpr, y = ...)) + 
+    geom_line() +
+    ylab("Cost per clinical case averted ($US)") +
+    xlab(expression(PfPr[2-10]~(symbol("\045")))) +
+    ylim(0, ymax) +
+    theme_bw() +
+    ggtitle(title)
+}
+
+cpc1 <- cp_plot(filter(cpc_data, cost_per_dose == 2), "$2", "Cost per clinical case averted ($US)", 210, icer_case)
+cpc2 <- cp_plot(filter(cpc_data, cost_per_dose == 5), "$5", "Cost per clinical case averted ($US)", 210, icer_case)
+cpc3 <- cp_plot(filter(cpc_data, cost_per_dose == 10), "$10", "Cost per clinical case averted ($US)", 210, icer_case)
+
+# TODO: check this is ddaly?
+cpd1 <-cp_plot(filter(cpc_data, cost_per_dose == 2), "$2", "Cost per DALY averted ($US)", 960, icer_ddaly)
+cpd2 <-cp_plot(filter(cpc_data, cost_per_dose == 5), "$5", "Cost per DALY averted ($US)", 960, icer_ddaly)
+cpd3 <-cp_plot(filter(cpc_data, cost_per_dose == 10), "$10", "Cost per DALY averted ($US)", 960, icer_ddaly)
+
+
+cp_plot <- (cpc1 | cpc2 | cpc3) / (cpd1 | cpd2 | cpd3)
+ggsave("analysis/plots/cost_per_case_daly_averted.png", cp_plot, height = 6, width = 8)
+################################################################################
+
 
 ### Impact by age, replicating Figure S4.1 #####################################
 impact_age <- epi_age %>%
