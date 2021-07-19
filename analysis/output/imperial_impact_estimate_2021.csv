@@ -1,11 +1,11 @@
-"pfpr","season","draw","rtss_coverage","fvp","cases_averted","deaths_averted","cases_averted_per_100000_fvp","deaths_averted_per_100000_fvp"
-0.03,"perennial",0,0.9,34645,7255,55,20941,159
-0.05,"perennial",0,0.9,34662,13439,68,38772,196
-0.1,"perennial",0,0.9,34459,15387,96,44653,279
-0.15,"perennial",0,0.9,34506,24578,102,71228,296
-0.2,"perennial",0,0.9,34298,28272,121,82430,353
-0.25,"perennial",0,0.9,34561,31369,125,90764,362
-0.35,"perennial",0,0.9,34987,39426,140,112688,400
-0.45,"perennial",0,0.9,34823,40897,151,117442,434
-0.55,"perennial",0,0.9,34692,38282,127,110348,366
-0.65,"perennial",0,0.9,34969,39630,120,113329,343
+"output","Imperial estimate (95% CrI)"
+"Proportion of clinical cases averted in children under 5 years","21.4 (1.6, 34.8)"
+"Proportion of deaths averted in children under 5 years","18 (-17.4, 35.5)"
+"Clinical cases averted per 100,000 FVP","97625 (15783, 201468)"
+"Deaths averted per 100,000 FVP","401 (129, 822)"
+"ICER per clinical case averted ($2 per dose)","12 (6, 81)"
+"ICER per clinical case averted ($5 per dose)","24 (11, 151)"
+"ICER per clinical case averted ($10 per dose)","42 (20, 266)"
+"ICER per DALY averted ($2 per dose)","105 (49, 352)"
+"ICER per DALY averted ($5 per dose)","202 (96, 652)"
+"ICER per DALY averted ($10 per dose)","362 (175, 1151)"

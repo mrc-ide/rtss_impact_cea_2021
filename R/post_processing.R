@@ -201,8 +201,148 @@ add_impact_fvp <- function(x){
   x %>%
     mutate(
       cases_averted_per_100000_fvp = 100000 * (cases_averted / num_vaccinees),
+      severe_averted_per_100000_fvp = 100000 * (severe_averted / num_vaccinees),
       deaths_averted_per_100000_fvp = 100000 * (deaths_averted / num_vaccinees)
     )
 }
 
+quantiles_epi <- function(x, ...){
+  x %>%
+    group_by(...) %>%
+    summarise(
+      cases_median = quantile(cases, 0.5),
+      cases_lower = quantile(cases, 0.025),
+      cases_upper = quantile(cases, 0.975),
+      
+      severe_median = quantile(severe, 0.5),
+      severe_lower = quantile(severe, 0.025),
+      severe_upper = quantile(severe, 0.975),
+      
+      deaths_median = quantile(deaths, 0.5),
+      deaths_lower = quantile(deaths, 0.025),
+      deaths_upper = quantile(deaths, 0.975),
+      
+      dalys_median = quantile(dalys, 0.5),
+      dalys_lower = quantile(dalys, 0.025),
+      dalys_upper = quantile(dalys, 0.975),
+      
+      ddalys_median = quantile(ddalys, 0.5),
+      ddalys_lower = quantile(ddalys, 0.025),
+      ddalys_upper = quantile(ddalys, 0.975),
+      
+      cases_cf_median = quantile(cases_cf, 0.5),
+      cases_cf_lower = quantile(cases_cf, 0.025),
+      cases_cf_upper = quantile(cases_cf, 0.975),
+      
+      severe_cf_median = quantile(severe_cf, 0.5),
+      severe_cf_lower = quantile(severe_cf, 0.025),
+      severe_cf_upper = quantile(severe_cf, 0.975),
+      
+      deaths_cf_median = quantile(deaths_cf, 0.5),
+      deaths_cf_lower = quantile(deaths_cf, 0.025),
+      deaths_cf_upper = quantile(deaths_cf, 0.975),
+      
+      dalys_cf_median = quantile(dalys_cf, 0.5),
+      dalys_cf_lower = quantile(dalys_cf, 0.025),
+      dalys_cf_upper = quantile(dalys_cf, 0.975),
+      
+      ddalys_cf_median = quantile(ddalys_cf, 0.5),
+      ddalys_cf_lower = quantile(ddalys_cf, 0.025),
+      ddalys_cf_upper = quantile(ddalys_cf, 0.975),
+      
+      cases_averted_median = quantile(cases_averted, 0.5),
+      cases_averted_lower = quantile(cases_averted, 0.025),
+      cases_averted_upper = quantile(cases_averted, 0.975),
+      
+      severe_averted_median = quantile(severe_averted, 0.5),
+      severe_averted_lower = quantile(severe_averted, 0.025),
+      severe_averted_upper = quantile(severe_averted, 0.975),
+      
+      deaths_averted_median = quantile(deaths_averted, 0.5),
+      deaths_averted_lower = quantile(deaths_averted, 0.025),
+      deaths_averted_upper = quantile(deaths_averted, 0.975),
+      
+      dalys_averted_median = quantile(dalys_averted, 0.5),
+      dalys_averted_lower = quantile(dalys_averted, 0.025),
+      dalys_averted_upper = quantile(dalys_averted, 0.975),
+      
+      ddalys_averted_median = quantile(ddalys_averted, 0.5),
+      ddalys_averted_lower = quantile(ddalys_averted, 0.025),
+      ddalys_averted_upper = quantile(ddalys_averted, 0.975)
+    ) %>%
+    ungroup()
+}
 
+quantiles_vx_tx <- function(x, ...){
+  x %>%
+    group_by(...) %>%
+    summarise(
+      num_vaccinees_median = quantile(num_vaccinees, 0.5),
+      num_vaccinees_lower = quantile(num_vaccinees, 0.025),
+      num_vaccinees_upper = quantile(num_vaccinees, 0.975),
+      
+      num_vacc_doses_median = quantile(num_vacc_doses, 0.5),
+      num_vacc_doses_lower = quantile(num_vacc_doses, 0.025),
+      num_vacc_doses_upper = quantile(num_vacc_doses, 0.975),
+      
+      num_vaccinees_boost_median = quantile(num_vaccinees_boost, 0.5),
+      num_vaccinees_boost_lower = quantile(num_vaccinees_boost, 0.025),
+      num_vaccinees_boost_upper = quantile(num_vaccinees_boost, 0.975),
+      
+      num_act_median = quantile(num_act, 0.5),
+      num_act_lower = quantile(num_act, 0.025),
+      num_act_upper = quantile(num_act, 0.975),
+      
+      num_non_act_median = quantile(num_non_act, 0.5),
+      num_non_act_lower = quantile(num_non_act, 0.025),
+      num_non_act_upper = quantile(num_non_act, 0.975),
+      
+      num_act_cf_median = quantile(num_act_cf, 0.5),
+      num_act_cf_lower = quantile(num_act_cf, 0.025),
+      num_act_cf_upper = quantile(num_act_cf, 0.975),
+      
+      num_non_act_cf_median = quantile(num_non_act_cf, 0.5),
+      num_non_act_cf_lower = quantile(num_non_act_cf, 0.025),
+      num_non_act_cf_upper = quantile(num_non_act_cf, 0.975)
+    ) %>%
+    ungroup()
+}
+
+quantile_impact <- function(x, ...){
+  x %>%
+    group_by(...) %>%
+    summarise(
+      cases_averted_median = quantile(cases_averted, 0.5),
+      cases_averted_lower = quantile(cases_averted, 0.025),
+      cases_averted_upper = quantile(cases_averted, 0.975),
+      
+      deaths_averted_median = quantile(deaths_averted, 0.5),
+      deaths_averted_lower = quantile(deaths_averted, 0.025),
+      deaths_averted_upper = quantile(deaths_averted, 0.975),
+      
+      cases_averted_per_100000_fvp_median = quantile(cases_averted_per_100000_fvp, 0.5),
+      cases_averted_per_100000_fvp_lower = quantile(cases_averted_per_100000_fvp, 0.025),
+      cases_averted_per_100000_fvp_upper = quantile(cases_averted_per_100000_fvp, 0.975),
+      
+      severe_averted_per_100000_fvp_median = quantile(severe_averted_per_100000_fvp, 0.5),
+      severe_averted_per_100000_fvp_lower = quantile(severe_averted_per_100000_fvp, 0.025),
+      severe_averted_per_100000_fvp_upper = quantile(severe_averted_per_100000_fvp, 0.975),
+      
+      deaths_averted_per_100000_fvp_median = quantile(deaths_averted_per_100000_fvp, 0.5),
+      deaths_averted_per_100000_fvp_lower = quantile(deaths_averted_per_100000_fvp, 0.025),
+      deaths_averted_per_100000_fvp_upper = quantile(deaths_averted_per_100000_fvp, 0.975),
+      
+      icer_case_median = quantile(icer_case, 0.5),
+      icer_case_lower = quantile(icer_case, 0.025),
+      icer_case_upper = quantile(icer_case, 0.975),
+      
+      icer_daly_median = quantile(icer_daly, 0.5),
+      icer_daly_lower = quantile(icer_daly, 0.025),
+      icer_daly_upper = quantile(icer_daly, 0.975),
+      
+      icer_ddaly_median = quantile(icer_ddaly, 0.5),
+      icer_ddaly_lower = quantile(icer_ddaly, 0.025),
+      icer_ddaly_upper = quantile(icer_ddaly, 0.975)
+    ) %>%
+    ungroup()
+}
