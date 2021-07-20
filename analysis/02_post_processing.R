@@ -218,7 +218,8 @@ ggsave("analysis/plots/impact_age_plot.png", impact_age_plot, height = 10, width
 
 prop_averted <- epi_age %>%
   filter(rtss_coverage == 0.8,
-         age_upper <= 5) %>%
+         age_upper <= 5,
+         pfpr >= 0.1) %>%
   mutate(prop_cases = cases_averted / cases_cf,
          prop_deaths = deaths_averted / deaths_cf)
 
@@ -231,7 +232,8 @@ averted <- epi %>%
   add_costs() %>%
   extimate_icer()  %>%
   filter(rtss_coverage == 0.8,
-         delivery_cost == 1.62)
+         delivery_cost == 1.62,
+         pfpr >= 0.1)
 
 ca_s <- round(quantile(filter(averted, cost_per_dose == 5)$cases_averted_per_100000_fvp, c(0.025, 0.5, 0.975)))
 da_s <- round(quantile(filter(averted, cost_per_dose == 5)$deaths_averted_per_100000_fvp, c(0.025, 0.5, 0.975)))
