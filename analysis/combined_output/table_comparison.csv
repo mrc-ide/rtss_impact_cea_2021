@@ -1,6 +1,6 @@
 "","outcome","SwissTPH","Imperial","Penny"
-"1","propDeathsAverted_U5","5.55 (3.3 to 6.3)","17.5 (3.9 to 20.8)","18.0% (6.0 to 29.1) 93"
-"2","propClinicalCasesAverted_U5","7.65 (4.4 to 9.1)","20.3 (18.1 to 23.6)","21.1% (7.9 to 30.6)"
+"1","propDeathsAverted_U5","8.95 (5.3 to 10.1)","17.5 (3.9 to 20.8)","18.0% (6.0 to 29.1) 93"
+"2","propClinicalCasesAverted_U5","12.2 (7 to 14.6)","20.3 (18.1 to 23.6)","21.1% (7.9 to 30.6)"
 "3","deathper100kvaccaverted","396.5 (205 to 540)","474 (315 to 534)","484 (189 to 859)"
 "4","clinicalCasesper100kvaccaverted","82336.5 (46978 to 121182)","119198 (57839 to 163206)","116480 (31450 to 160410)"
 "5","costperdaly_2","55.5 (42 to 120)","41 (35 to 65)","$38 (18 to 97)"
