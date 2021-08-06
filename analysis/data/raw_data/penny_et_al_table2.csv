@@ -1,0 +1,11 @@
+outcome,Penny
+propDeathsAverted_U5,18.0% (6.0 to 29.1) 93
+propClinicalCasesAverted_U5,21.1% (7.9 to 30.6)
+deathper100kvaccaverted,484 (189 to 859)
+clinicalCasesper100kvaccaverted,116480 (31450 to 160410)
+costperdaly_2,$38 (18 to 97)
+costperdaly_5,$87 (48 to 244) $154
+costperdaly_10,$154 (99 to 487)
+costperClinicalCase_2,$10 (6 to 93)
+costperClinicalCase_5,$25 (16 to 222)
+costperClinicalCase_10,$51 (28 to 437)

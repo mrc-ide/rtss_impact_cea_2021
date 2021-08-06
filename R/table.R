@@ -34,7 +34,6 @@ get_impact <- function(impact, lower_pfpr, upper_pfpr){
     group_by(pfpr, rtss_coverage, delivery_cost) %>%
     summarise(
       deathper100kvaccaverted = median(deaths_averted_per_100000_fvp),
-      severeCasesper100kvaccaverted = median(hospitalisations_averted_per_100000_fvp),
       clinicalCasesper100kvaccaverted = median(cases_averted_per_100000_fvp)
     ) %>%
     pivot_longer(-c(pfpr, rtss_coverage, delivery_cost), names_to = "outcome", values_to = "y") %>%
