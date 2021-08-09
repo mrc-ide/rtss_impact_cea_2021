@@ -38,7 +38,7 @@ write.csv(table, "analysis/combined_output/main_table.csv")
 
 
 
-### Apnnex  ####################################################################
+### Annex  ####################################################################
 # Main figure: low coverage (50%)
 imperial_impact <- readRDS("analysis/data/derived_data/impact.RDS") %>%
   filter(rtss_coverage == 0.5, delivery_cost == 1.62)
@@ -76,6 +76,19 @@ imperial_table_high <- read.csv("analysis/output/imperial_impact_estimate_2021.c
   select(outcome, Imperial)
 table_high <- left_join(swiss_table_high, imperial_table_high, by = "outcome")
 write.csv(table_high, "analysis/combined_output/main_table_high_coverage.csv")
+
+# Main figure: min Cod
+imperial_impact <- readRDS("analysis/data/derived_data/impact.RDS") %>%
+  filter(rtss_coverage == 0.8, delivery_cost == 0.96)
+load(paste0(dropbox_loc, "2021_predictions/Data_July2021/SwissTPH/SwissTPH_transmissionCovSen_20210709_Cov_3d_80_4d_64_min.Rdata"))
+figure_min_cod <- make_main_figure(imperial_impact, Data_SwissTPH)
+ggsave("analysis/combined_output/figure_min_cod.png", figure_min_cod, height = 6, width = 10)
+# Main figure: max Cod
+imperial_impact <- readRDS("analysis/data/derived_data/impact.RDS") %>%
+  filter(rtss_coverage == 0.8, delivery_cost == 2.67)
+load(paste0(dropbox_loc, "2021_predictions/Data_July2021/SwissTPH/SwissTPH_transmissionCovSen_20210709_Cov_3d_80_4d_64_max.Rdata"))
+figure_max_cod <- make_main_figure(imperial_impact, Data_SwissTPH)
+ggsave("analysis/combined_output/figure_max_cod.png", figure_max_cod, height = 6, width = 10)
 ################################################################################
 
 ### Appex table for comparison #################################################
