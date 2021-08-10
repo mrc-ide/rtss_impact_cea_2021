@@ -181,14 +181,19 @@ aggregate_vx_tx <- function(x, ...){
 add_costs <- function(x, cost_per_dose = c(2, 5, 10), delivery_cost = c(0.96, 1.62,	2.67), tx_unit_cost = 1.47, severe_unit_cost = 22.41){
   cost_df <- expand_grid(cost_per_dose = cost_per_dose, delivery_cost = delivery_cost)
   merge(x, cost_df, by = NULL) %>%
-    mutate(vaccine_cost = num_vacc_doses * (cost_per_dose + delivery_cost),
-           tx_cost = (num_act + num_non_act) * tx_unit_cost,
-           tx_cost_cf = (num_act_cf + num_non_act_cf) * tx_unit_cost,
-           severe_cost = severe * severe_unit_cost,
-           severe_cost_cf = severe_cf * severe_unit_cost,
-           cost = vaccine_cost + tx_cost + severe_cost,
-           cost_cf = tx_cost_cf + severe_cost_cf,
-           marginal_cost = cost - cost_cf)
+    mutate(full_cost_per_dose = case_when(
+      cost_per_dose == 2 ~ 2.69,
+      cost_per_dose == 5 ~ 6.52,
+      cost_per_dose == 10 ~ 12.91
+    ),
+    vaccine_cost = num_vacc_doses * (full_cost_per_dose + delivery_cost),
+    tx_cost = (num_act + num_non_act) * tx_unit_cost,
+    tx_cost_cf = (num_act_cf + num_non_act_cf) * tx_unit_cost,
+    severe_cost = severe * severe_unit_cost,
+    severe_cost_cf = severe_cf * severe_unit_cost,
+    cost = vaccine_cost + tx_cost + severe_cost,
+    cost_cf = tx_cost_cf + severe_cost_cf,
+    marginal_cost = cost - cost_cf)
 }
 
 add_proportion <- function(x){
@@ -231,7 +236,7 @@ quantile_impact <- function(x, ...){
       deaths_averted_median = quantile(deaths_averted, 0.5),
       deaths_averted_lower = quantile(deaths_averted, 0.025),
       deaths_averted_upper = quantile(deaths_averted, 0.975),
-
+      
       cases_averted_per_100000_fvp_median = quantile(cases_averted_per_100000_fvp, 0.5),
       cases_averted_per_100000_fvp_lower = quantile(cases_averted_per_100000_fvp, 0.025),
       cases_averted_per_100000_fvp_upper = quantile(cases_averted_per_100000_fvp, 0.975),
@@ -278,7 +283,7 @@ quantile_epi_impact <- function(x, ...){
       deaths_averted_median = quantile(deaths_averted, 0.5),
       deaths_averted_lower = quantile(deaths_averted, 0.025),
       deaths_averted_upper = quantile(deaths_averted, 0.975),
-
+      
       cases_averted_per_100000_fvp_median = quantile(cases_averted_per_100000_fvp, 0.5),
       cases_averted_per_100000_fvp_lower = quantile(cases_averted_per_100000_fvp, 0.025),
       cases_averted_per_100000_fvp_upper = quantile(cases_averted_per_100000_fvp, 0.975),
@@ -312,7 +317,7 @@ quantile_table <- function(x, ...){
       cases_averted_per_100000_fvp_median = quantile(cases_averted_per_100000_fvp, 0.5),
       cases_averted_per_100000_fvp_lower = quantile(cases_averted_per_100000_fvp, 0.025),
       cases_averted_per_100000_fvp_upper = quantile(cases_averted_per_100000_fvp, 0.975),
-
+      
       hospitalisations_averted_per_100000_fvp_median = quantile(hospitalisations_averted_per_100000_fvp, 0.5),
       hospitalisations_averted_per_100000_fvp_lower = quantile(hospitalisations_averted_per_100000_fvp, 0.025),
       hospitalisations_averted_per_100000_fvp_upper = quantile(hospitalisations_averted_per_100000_fvp, 0.975),
@@ -324,11 +329,10 @@ quantile_table <- function(x, ...){
       icer_case_median = quantile(icer_case, 0.5),
       icer_case_lower = quantile(icer_case, 0.025),
       icer_case_upper = quantile(icer_case, 0.975),
-
+      
       icer_ddaly_median = quantile(icer_ddaly, 0.5),
       icer_ddaly_lower = quantile(icer_ddaly, 0.025),
       icer_ddaly_upper = quantile(icer_ddaly, 0.975)
     ) %>%
     ungroup()
 }
-      
