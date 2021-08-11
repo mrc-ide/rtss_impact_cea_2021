@@ -150,4 +150,40 @@ ce_compare <- bind_rows(cov80codmean, cov50codmean, cov90codmean, cov80codmin, c
   pivot_wider(names_from = scenario, values_from = y) %>%
   arrange(Group)
 write.csv(ce_compare, "analysis/combined_output/cea_comparsion.csv")
+
+
+ce_compare_pd <- ce_compare %>%
+  pivot_longer(-c(outcome, Group), names_to = "scenario", values_to = "y") %>%
+  mutate(y = stringr::str_replace(y, " to ", " "),
+         y = stringr::str_replace(y, "[(]", ""),
+         y = stringr::str_replace(y, "[)]", "")) %>%
+  separate(y, into = c("y", "y_lower", "y_upper"), sep = " ") %>%
+  mutate(y = as.numeric(y),
+         y_lower = as.numeric(y_lower),
+         y_upper = as.numeric(y_upper)) %>%
+  mutate(outcome2 = ifelse(grepl("daly", outcome), "DALYs", "Clinical cases"),
+         level = case_when(grepl("2", outcome) ~ 2,
+                           grepl("5", outcome) ~ 5,
+                           grepl("10", outcome) ~ 10),
+         scenario2 = case_when(
+           scenario == "cov80codmean" ~ "Coverage\n 80%\n CoD\n mean",
+           scenario == "cov50codmean" ~ "Coverage\n 50%\n CoD\n mean",
+           scenario == "cov90codmean" ~ "Coverage\n 90%\n CoD\n mean",
+           scenario == "cov80codmin" ~ "Coverage\n 80%\n CoD\n min",
+           scenario == "cov80codmax" ~ "Coverage\n 80%\n CoD\n max"
+         ),
+         scenario2 = factor(scenario2, levels = c("Coverage\n 80%\n CoD\n mean", "Coverage\n 50%\n CoD\n mean",
+                                                  "Coverage\n 90%\n CoD\n mean", "Coverage\n 80%\n CoD\n min",
+                                                  "Coverage\n 80%\n CoD\n max")))
+
+ce_compare_plot <- ggplot(ce_compare_pd, aes(x = scenario2, y = y, ymin = y_lower, ymax = y_upper, col = factor(level))) + 
+  geom_linerange(position = position_dodge(width = 0.5)) + 
+  geom_point(position = position_dodge(width = 0.5)) +
+  facet_grid(outcome2 ~ Group, scales = "free_y") +
+  scale_colour_discrete(name = "Cost\nper\ndose ($)") +
+  ylab("Cost ($) per event averted") +
+  xlab("") + 
+  theme_bw() +
+  theme(strip.background = element_rect(fill = 'white'))
+ggsave("analysis/combined_output/ce_compare.png", ce_compare_plot, height = 5, width = 8)
 ################################################################################
