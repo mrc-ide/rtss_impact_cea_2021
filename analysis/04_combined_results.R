@@ -8,6 +8,7 @@ library(ggplot2)
 library(patchwork)
 
 source("R/main_figure.R")
+source("R/tornado_figure.R")
 source("R/post_processing.R")
 
 dropbox_loc <- "C:/Users/pwinskil/Dropbox (SPH Imperial College)/shared_RTSScomparison2021/"
@@ -186,4 +187,17 @@ ce_compare_plot <- ggplot(ce_compare_pd, aes(x = scenario2, y = y, ymin = y_lowe
   theme_bw() +
   theme(strip.background = element_rect(fill = 'white'))
 ggsave("analysis/combined_output/ce_compare.png", ce_compare_plot, height = 5, width = 8)
+
+t1 <- tornado(ce_compare_pd, "SwissTPH", "DALYs", "Swiss TPH", c(-100, -50, 0, 50, 100, 150, 200, 250, 300, 350) + 3)
+t2 <- tornado(ce_compare_pd, "SwissTPH", "Clinical cases", "Swiss TPH", c(-50, 0, 50, 100) + 1)
+t3 <- tornado(ce_compare_pd, "Imperial", "DALYs", "Imperial", c(-100, -50, 0, 50, 100, 150, 200, 250, 300, 350) -3)
+t4 <- tornado(ce_compare_pd, "Imperial", "Clinical cases", "Imperial", c(-50, 0, 50, 100) + 32)
+
+tornado_plot <- (t1 / t3) | (t2 / t4)
+ggsave("analysis/combined_output/tornado_plot.png", tornado_plot, height = 4, width = 8, scale = 1.2)
 ################################################################################
+
+
+
+
+
