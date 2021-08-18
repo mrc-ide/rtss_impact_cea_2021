@@ -20,6 +20,9 @@ imperial_impact <- readRDS("analysis/data/derived_data/impact.RDS") %>%
 load(paste0(dropbox_loc, "2021_predictions/Data_July2021/SwissTPH/SwissTPH_transmissionCovSen_20210709_Cov_3d_80_4d_64.Rdata"))
 figure <- make_main_figure(imperial_impact, Data_SwissTPH)
 ggsave("analysis/combined_output/main_figure.png", figure, height = 6, width = 10)
+
+figure_zoom <- make_main_figure(imperial_impact, Data_SwissTPH, 500)
+ggsave("analysis/combined_output/main_figure_zoomed.png", figure_zoom, height = 6, width = 10)
 ################################################################################
 
 ### Main table #################################################################
@@ -197,7 +200,17 @@ tornado_plot <- (t1 / t3) | (t2 / t4)
 ggsave("analysis/combined_output/tornado_plot.png", tornado_plot, height = 4, width = 8, scale = 1.2)
 ################################################################################
 
+# Approximation of % increase
+old <- 2.69
+new <- old + 1.62
+(new - old) / old
 
+old <- 6.52
+new <- old + 1.62
+(new - old) / old
 
+old <- 12.91
+new <- old + 1.62
+(new - old) / old
 
 

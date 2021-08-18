@@ -1,4 +1,4 @@
-make_main_figure <- function(imperial_impact, swisstph){
+make_main_figure <- function(imperial_impact, swisstph, icer_y_upper = 1000){
   ### Top row: Impact per 100,000 FVP ##########################################
   swiss_pd <- swisstph %>%
     filter(Vaccine == "with_booster",
@@ -117,7 +117,7 @@ make_main_figure <- function(imperial_impact, swisstph){
     scale_fill_manual(values = c("#009fc4", "#c5a0c1"), name = "") +
     scale_colour_manual(values = c("#009fc4", "#c5a0c1"), name = "") +
     theme_bw() +
-    coord_cartesian(ylim = c(0, 1000)) +
+    coord_cartesian(ylim = c(0, icer_y_upper)) +
     ggtitle("$2")
   
   # $5 per dose
@@ -129,7 +129,7 @@ make_main_figure <- function(imperial_impact, swisstph){
     scale_fill_manual(values = c("#009fc4", "#c5a0c1"), name = "") +
     scale_colour_manual(values = c("#009fc4", "#c5a0c1"), name = "") +
     theme_bw() +
-    coord_cartesian(ylim = c(0, 1000)) +
+    coord_cartesian(ylim = c(0, icer_y_upper)) +
     ggtitle("$5")
   
   # $10 per dose
@@ -141,7 +141,7 @@ make_main_figure <- function(imperial_impact, swisstph){
     scale_fill_manual(values = c("#009fc4", "#c5a0c1"), name = "") +
     scale_colour_manual(values = c("#009fc4", "#c5a0c1"), name = "") +
     theme_bw() +
-    coord_cartesian(ylim = c(0, 1000)) +
+    coord_cartesian(ylim = c(0, icer_y_upper)) +
     ggtitle("$10")
   
 
